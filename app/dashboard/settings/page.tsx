@@ -53,15 +53,17 @@ export default function SettingsPage() {
       <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-6">
         {field("Mensagem de ausência", "Enviada automaticamente quando o agente está pausado.",
           <textarea value={settings.pauseMessage} onChange={(e) => setSettings({ ...settings, pauseMessage: e.target.value })} rows={3}
+            title="Mensagem de ausência" placeholder="Ex: No momento estamos ausentes..."
             className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         )}
         {field("Nome do atendente humano", "Exibido nas mensagens enviadas manualmente pelo dashboard.",
           <input type="text" value={settings.attendantName} onChange={(e) => setSettings({ ...settings, attendantName: e.target.value })}
+            title="Nome do atendente" placeholder="Ex: João Silva"
             className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         )}
         {field("Email de notificação", "Receba um email quando uma mensagem chegar em modo humano.",
           <input type="email" value={settings.notifyEmail || ""} onChange={(e) => setSettings({ ...settings, notifyEmail: e.target.value })}
-            placeholder="seu@email.com" className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            title="Email de notificação" placeholder="seu@email.com" className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
         )}
 
         <div className="flex items-center gap-3 pt-2 border-t border-gray-100">

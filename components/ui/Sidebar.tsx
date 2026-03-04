@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: "📊" },
   { href: "/dashboard/inbox", label: "Inbox", icon: "💬" },
-  { href: "/dashboard/bot", label: "Personalizar Bot", icon: "🤖" },
   { href: "/dashboard/followup", label: "Follow Up", icon: "📅" },
   { href: "/dashboard/leads", label: "Leads", icon: "👥" },
   { href: "/dashboard/settings", label: "Configurações", icon: "⚙️" },

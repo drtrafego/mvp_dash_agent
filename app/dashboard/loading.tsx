@@ -1,9 +1,14 @@
-export default function Loading() {
+export default function DashboardLoading() {
     return (
-        <div className="flex h-full w-full items-center justify-center bg-gray-950">
-            <div className="flex flex-col items-center gap-4">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
-                <p className="text-sm text-gray-400">Carregando painel...</p>
+        <div className="p-8 max-w-5xl mx-auto">
+            <div className="animate-pulse space-y-4">
+                <div className="h-8 bg-gray-200 rounded w-48" />
+                <div className="grid grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map((i) => <div key={i} className="h-24 bg-gray-200 rounded-2xl" />)}
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => <div key={i} className="h-40 bg-gray-200 rounded-2xl" />)}
+                </div>
             </div>
         </div>
     );

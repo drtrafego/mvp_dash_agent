@@ -1,3 +1,5 @@
+"use client";
+
 import { useUser } from "@stackframe/stack";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";

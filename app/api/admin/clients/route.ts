@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: "desc" },
         select: {
             id: true,
+            email: true,
             stackUserId: true,
             companyName: true,
             zaiaAgentId: true,
@@ -36,38 +37,20 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Campos obrigatórios: email, companyName, zaiaAgentId, zaiaApiKey" }, { status: 400 });
     }
 
-    // Busca o usuário pelo email no Stack Auth
-    let stackUserId: string;
-    try {
-        const result = await stackServerApp.listUsers();
-        // Stack Auth returns ServerUser[] (array-like with nextCursor) — treat as array
-        const users = Array.from(result) as { id: string; primaryEmail: string | null }[];
-        const found = users.find((u) => u.primaryEmail === email);
-        if (!found) {
-            return NextResponse.json(
-                { error: `Usuário com email "${email}" não encontrado no Stack Auth. O cliente precisa se cadastrar primeiro em /login.` },
-                { status: 404 }
-            );
-        }
-        stackUserId = found.id;
-    } catch {
-        return NextResponse.json({ error: "Erro ao buscar usuário no Stack Auth" }, { status: 500 });
-    }
-
-    // Verifica se já existe um Client para esse usuário ou agente
+    // Verifica se já existe um Client para esse email ou agente
     const existing = await db.client.findFirst({
-        where: { OR: [{ stackUserId }, { zaiaAgentId }] },
+        where: { OR: [{ email }, { zaiaAgentId }] },
     });
     if (existing) {
         return NextResponse.json(
-            { error: "Já existe um cliente com esse usuário ou agente Zaia." },
+            { error: "Já existe um cliente com esse email ou agente Zaia." },
             { status: 409 }
         );
     }
 
     const client = await db.client.create({
         data: {
-            stackUserId,
+            email,
             companyName,
             zaiaAgentId,
             zaiaApiKey,
@@ -77,3 +60,4 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ client }, { status: 201 });
 }
+

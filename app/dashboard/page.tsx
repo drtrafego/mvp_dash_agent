@@ -4,12 +4,13 @@ import { zaiaAPI } from "@/lib/zaia";
 import { redirect } from "next/navigation";
 import StatsCard from "@/components/dashboard/StatsCard";
 import AgentModeControl from "@/components/dashboard/AgentModeControl";
+import { getUserClient } from "@/lib/db-helper";
 
 export default async function DashboardPage() {
   const user = await stackServerApp.getUser();
-  if (!user) redirect("/login");
+  if (!user) return null;
 
-  const client = await db.client.findUnique({ where: { stackUserId: user.id } });
+  const client = await getUserClient(user.id, user.primaryEmail);
 
   if (!client) {
     return (

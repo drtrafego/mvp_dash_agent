@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { stackServerApp } from "@/stack";
 import { db } from "@/lib/db";
+import { getUserClient } from "@/lib/db-helper";
 
 export async function PATCH(
   req: NextRequest,
@@ -15,7 +16,7 @@ export async function PATCH(
   if (!["new", "qualified", "converted"].includes(status))
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
-  const client = await db.client.findUnique({ where: { stackUserId: user.id } });
+  const client = await getUserClient(user.id, user.primaryEmail);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const lead = await db.lead.findUnique({ where: { id } });

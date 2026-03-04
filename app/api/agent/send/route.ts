@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { stackServerApp } from "@/stack";
 import { db } from "@/lib/db";
 import { zaiaAPI } from "@/lib/zaia";
+import { getUserClient } from "@/lib/db-helper";
 
 export async function POST(req: NextRequest) {
   const user = await stackServerApp.getUser();
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { conversationId, message } = await req.json();
 
-  const client = await db.client.findUnique({ where: { stackUserId: user.id } });
+  const client = await getUserClient(user.id, user.primaryEmail);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const conv = await db.conversation.findUnique({ where: { id: conversationId } });

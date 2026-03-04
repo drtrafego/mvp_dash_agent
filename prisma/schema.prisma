@@ -9,7 +9,8 @@ datasource db {
 
 model Client {
   id            String         @id @default(cuid())
-  stackUserId   String         @unique
+  stackUserId   String?        @unique
+  email         String?        @unique
   companyName   String
   zaiaAgentId   String         @unique
   zaiaApiKey    String

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { stackServerApp } from "@/stack";
 import { db } from "@/lib/db";
+import { getUserClient } from "@/lib/db-helper";
 
 export async function GET(
   _req: NextRequest,
@@ -10,7 +11,7 @@ export async function GET(
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const client = await db.client.findUnique({ where: { stackUserId: user.id } });
+  const client = await getUserClient(user.id, user.primaryEmail);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const conv = await db.conversation.findUnique({ where: { id } });

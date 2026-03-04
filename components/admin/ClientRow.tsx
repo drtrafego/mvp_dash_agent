@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface Client {
     id: string;
@@ -78,6 +79,13 @@ export default function ClientRow({ client, onUpdated, onDeleted }: Props) {
                 </div>
 
                 <div className="flex items-center gap-5 text-center shrink-0">
+                    <Link
+                        href={`/dashboard?clientId=${client.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-[11px] font-semibold transition-colors border border-gray-700"
+                    >
+                        <span>👁️</span> Visualizar
+                    </Link>
                     <div className="hidden sm:block">
                         <p className="text-sm font-bold text-white">{client._count.conversations}</p>
                         <p className="text-[10px] text-gray-500">Convs</p>

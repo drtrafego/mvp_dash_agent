@@ -16,7 +16,10 @@ export async function PATCH(
   if (!["new", "qualified", "converted"].includes(status))
     return Response.json({ error: "Invalid status" }, { status: 400 });
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const { searchParams } = new URL(req.url);
+  const clientId = searchParams.get("clientId");
+
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const lead = await db.lead.findUnique({ where: { id } });

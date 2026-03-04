@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Settings { companyName: string; pauseMessage: string; attendantName: string; notifyEmail?: string | null; plan: string; }
 
@@ -9,16 +10,20 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
 
   useEffect(() => {
-    fetch("/api/settings").then((r) => r.json()).then((d) => { if (d.settings) setSettings(d.settings); }).finally(() => setLoading(false));
-  }, []);
+    const url = `/api/settings${clientId ? `?clientId=${clientId}` : ""}`;
+    fetch(url).then((r) => r.json()).then((d) => { if (d.settings) setSettings(d.settings); }).finally(() => setLoading(false));
+  }, [clientId]);
 
   const handleSave = async () => {
     if (!settings) return;
     setSaving(true);
     try {
-      await fetch("/api/settings", {
+      const url = `/api/settings${clientId ? `?clientId=${clientId}` : ""}`;
+      await fetch(url, {
         method: "PATCH", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pauseMessage: settings.pauseMessage, attendantName: settings.attendantName, notifyEmail: settings.notifyEmail || null }),
       });

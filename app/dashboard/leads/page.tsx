@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 interface Lead { id: string; name?: string | null; phone: string; email?: string | null; status: string; createdAt: string; }
 
@@ -14,13 +15,17 @@ const statusCfg: Record<string, { label: string; cls: string }> = {
 export default function LeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
 
   useEffect(() => {
-    fetch("/api/leads").then((r) => r.json()).then((d) => setLeads(d.leads ?? [])).finally(() => setLoading(false));
-  }, []);
+    const url = `/api/leads${clientId ? `?clientId=${clientId}` : ""}`;
+    fetch(url).then((r) => r.json()).then((d) => setLeads(d.leads ?? [])).finally(() => setLoading(false));
+  }, [clientId]);
 
   const updateStatus = async (id: string, status: string) => {
-    await fetch(`/api/leads/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    const url = `/api/leads/${id}${clientId ? `?clientId=${clientId}` : ""}`;
+    await fetch(url, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
     setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status } : l)));
   };
 
@@ -58,6 +63,7 @@ export default function LeadsPage() {
                       <td className="px-6 py-4">
                         <select
                           value={lead.status}
+                          title="Status do lead"
                           onChange={(e) => updateStatus(lead.id, e.target.value)}
                           className={`text-xs font-medium px-2.5 py-1 rounded-full cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 ${cfg.cls}`}
                         >
@@ -68,7 +74,7 @@ export default function LeadsPage() {
                       </td>
                       <td className="px-6 py-4 text-gray-500">{new Date(lead.createdAt).toLocaleDateString("pt-BR")}</td>
                       <td className="px-6 py-4">
-                        <Link href="/dashboard/inbox" className="text-blue-600 hover:text-blue-700 text-xs font-medium">Ver conversa →</Link>
+                        <Link href={`/dashboard/inbox${clientId ? `?clientId=${clientId}` : ""}`} className="text-blue-600 hover:text-blue-700 text-xs font-medium">Ver conversa →</Link>
                       </td>
                     </tr>
                   );

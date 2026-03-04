@@ -6,11 +6,12 @@ import StatsCard from "@/components/dashboard/StatsCard";
 import AgentModeControl from "@/components/dashboard/AgentModeControl";
 import { getUserClient } from "@/lib/db-helper";
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: { searchParams: Promise<{ clientId?: string }> }) {
+  const searchParams = await props.searchParams;
   const user = await stackServerApp.getUser();
   if (!user) return null;
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const client = await getUserClient(user.id, user.primaryEmail, searchParams.clientId);
 
   if (!client) {
     return (

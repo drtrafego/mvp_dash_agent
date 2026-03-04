@@ -3,11 +3,12 @@ import { stackServerApp } from "@/stack";
 import { db } from "@/lib/db";
 import { getUserClient } from "@/lib/db-helper";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const user = await stackServerApp.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const clientId = req.nextUrl.searchParams.get("clientId");
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const settings = await db.client.findUnique({
@@ -22,7 +23,8 @@ export async function PATCH(req: NextRequest) {
   const user = await stackServerApp.getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const clientId = req.nextUrl.searchParams.get("clientId");
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const { pauseMessage, attendantName, notifyEmail } = await req.json();

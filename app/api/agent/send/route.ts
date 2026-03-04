@@ -10,7 +10,8 @@ export async function POST(req: NextRequest) {
 
   const { conversationId, message } = await req.json();
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const clientId = req.nextUrl.searchParams.get("clientId");
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const conv = await db.conversation.findUnique({ where: { id: conversationId } });

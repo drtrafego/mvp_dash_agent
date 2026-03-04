@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import ConversationList, { Conversation } from "@/components/inbox/ConversationList";
 import ChatWindow, { Message } from "@/components/inbox/ChatWindow";
 
@@ -9,10 +10,13 @@ export default function InboxPage() {
   const [selected, setSelected] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const clientId = searchParams.get("clientId");
 
   const fetchConvs = useCallback(async () => {
     try {
-      const res = await fetch("/api/conversations");
+      const url = `/api/conversations${clientId ? `?clientId=${clientId}` : ""}`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setConversations(data.conversations);
@@ -20,14 +24,15 @@ export default function InboxPage() {
       }
     } catch { /* silent */ }
     setLoading(false);
-  }, []);
+  }, [clientId]);
 
   const fetchMsgs = useCallback(async (id: string) => {
     try {
-      const res = await fetch(`/api/conversations/${id}/messages`);
+      const url = `/api/conversations/${id}/messages${clientId ? `?clientId=${clientId}` : ""}`;
+      const res = await fetch(url);
       if (res.ok) { const d = await res.json(); setMessages(d.messages); }
     } catch { /* silent */ }
-  }, []);
+  }, [clientId]);
 
   useEffect(() => { fetchConvs(); }, [fetchConvs]);
   useEffect(() => { const t = setInterval(fetchConvs, 3000); return () => clearInterval(t); }, [fetchConvs]);
@@ -37,11 +42,12 @@ export default function InboxPage() {
     fetchMsgs(selected.id);
     const t = setInterval(() => fetchMsgs(selected.id), 3000);
     return () => clearInterval(t);
-  }, [selected?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selected?.id, fetchMsgs]);
 
   const handleSend = async (message: string) => {
     if (!selected) return;
-    await fetch("/api/agent/send", {
+    const url = `/api/agent/send${clientId ? `?clientId=${clientId}` : ""}`;
+    await fetch(url, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ conversationId: selected.id, message }),
     });
@@ -50,7 +56,8 @@ export default function InboxPage() {
 
   const handleMode = async (mode: "bot" | "humano") => {
     if (!selected) return;
-    await fetch("/api/agent/mode", {
+    const url = `/api/agent/mode${clientId ? `?clientId=${clientId}` : ""}`;
+    await fetch(url, {
       method: "PATCH", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode, sessionId: selected.contactPhone }),
     });

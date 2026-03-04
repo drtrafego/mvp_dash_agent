@@ -11,7 +11,10 @@ export async function GET(
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const { searchParams } = new URL(_req.url);
+  const clientId = searchParams.get("clientId");
+
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   const conv = await db.conversation.findUnique({ where: { id } });

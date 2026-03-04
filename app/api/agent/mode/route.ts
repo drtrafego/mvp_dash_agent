@@ -12,7 +12,8 @@ export async function PATCH(req: NextRequest) {
   if (!["bot", "humano", "pausado"].includes(mode))
     return Response.json({ error: "Invalid mode" }, { status: 400 });
 
-  const client = await getUserClient(user.id, user.primaryEmail);
+  const clientId = req.nextUrl.searchParams.get("clientId");
+  const client = await getUserClient(user.id, user.primaryEmail, clientId);
   if (!client) return Response.json({ error: "Client not found" }, { status: 404 });
 
   await zaiaAPI.setMode(client.zaiaAgentId, mode, client.zaiaApiKey, sessionId);

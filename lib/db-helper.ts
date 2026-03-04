@@ -1,33 +1,40 @@
-import { db } from "@/lib/db";
+import { db } from "./db";
+import { isSuperAdmin } from "./admin-auth";
 
-export async function getUserClient(userId: string, userEmail?: string | null) {
-    if (!userEmail) {
-        return await db.client.findFirst({
-            where: { stackUserId: userId },
-        });
+/**
+ * Helper para buscar o cliente associado ao usuário logado.
+ * 
+ * @param userId ID do usuário no Stack Auth
+ * @param userEmail Email do usuário no Stack Auth (opcional)
+ * @param impersonatedClientId ID do cliente a ser "impersonado" (apenas superadmins)
+ */
+export async function getUserClient(userId: string, userEmail?: string | null, impersonatedClientId?: string | null) {
+    // Se houver ID de impersonação, verificamos se o usuário é superadmin primeiro
+    if (impersonatedClientId) {
+        const isAdmin = await isSuperAdmin(userEmail);
+        if (isAdmin) {
+            return await db.client.findUnique({
+                where: { id: impersonatedClientId }
+            });
+        }
     }
 
-    // Find the client by ID or Email
-    const client = await db.client.findFirst({
-        where: {
-            OR: [
-                { stackUserId: userId },
-                { email: userEmail },
-            ],
-        },
+    // Busca normal por stackUserId (para o cliente logado ou admin vendo seu próprio dashboard se cadastrado)
+    let client = await db.client.findUnique({
+        where: { stackUserId: userId },
     });
 
-    if (!client) {
-        return null;
-    }
-
-    // If the client exists but doesn't have the stackUserId set yet (pre-registered by email)
-    // we bind it now.
-    if (!client.stackUserId || client.stackUserId !== userId) {
-        return await db.client.update({
-            where: { id: client.id },
-            data: { stackUserId: userId },
+    if (!client && userEmail) {
+        client = await db.client.findUnique({
+            where: { email: userEmail },
         });
+
+        if (client) {
+            client = await db.client.update({
+                where: { id: client.id },
+                data: { stackUserId: userId },
+            });
+        }
     }
 
     return client;

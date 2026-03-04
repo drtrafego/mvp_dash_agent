@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id            String         @id @default(cuid())
+  stackUserId   String         @unique
+  companyName   String
+  zaiaAgentId   String         @unique
+  zaiaApiKey    String
+  plan          String         @default("basic")
+  active        Boolean        @default(true)
+  pauseMessage  String         @default("Retornaremos em breve!")
+  attendantName String         @default("Atendente")
+  notifyEmail   String?
+  conversations Conversation[]
+  leads         Lead[]
+  createdAt     DateTime       @default(now())
+}
+
+model Conversation {
+  id            String    @id @default(cuid())
+  clientId      String
+  client        Client    @relation(fields: [clientId], references: [id])
+  contactPhone  String
+  contactName   String?
+  status        String    @default("open")  // open | closed
+  mode          String    @default("bot")   // bot | humano
+  unreadCount   Int       @default(0)
+  lastMessage   String?
+  lastMessageAt DateTime?
+  messages      Message[]
+  createdAt     DateTime  @default(now())
+
+  @@unique([clientId, contactPhone])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  direction      String       // "in" | "out"
+  content        String
+  sentBy         String       @default("bot") // "bot" | "human" | "client"
+  timestamp      DateTime     @default(now())
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  name      String?
+  phone     String
+  email     String?
+  status    String   @default("new") // new | qualified | converted
+  source    String   @default("whatsapp")
+  createdAt DateTime @default(now())
+
+  @@unique([clientId, phone])
+}

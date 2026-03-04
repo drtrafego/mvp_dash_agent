@@ -1,3 +1,3 @@
 import { stackServerApp } from "@/stack";
 
-export const { GET, POST } = stackServerApp.useHandler();
+export const { GET, POST } = stackServerApp.getNextJsApiHandlers();

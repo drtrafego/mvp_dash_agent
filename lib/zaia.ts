@@ -1,11 +1,13 @@
 const ZAIA_BASE = "https://api.zaia.app";
+const ZAIA_CORE = "https://core-service.zaia.app";
 
 export const zaiaFetch = async (
   endpoint: string,
   options: RequestInit = {},
-  apiKey: string
+  apiKey: string,
+  baseUrl = ZAIA_BASE
 ) => {
-  const res = await fetch(`${ZAIA_BASE}${endpoint}`, {
+  const res = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -21,9 +23,21 @@ export const zaiaFetch = async (
 };
 
 export const zaiaAPI = {
+  // ─── Consumo ─────────────────────────────────────────────────────────────
   getUsage: (apiKey: string) =>
     zaiaFetch("/v1.1/api/retrieve-usage", {}, apiKey),
 
+  // ─── Agente ──────────────────────────────────────────────────────────────
+  getAgent: (agentId: string, apiKey: string) =>
+    zaiaFetch(`/v1.1/api/agent/retrieve?agentId=${agentId}`, {}, apiKey),
+
+  updateAgent: (agentId: string, data: Record<string, unknown>, apiKey: string) =>
+    zaiaFetch("/v1.1/api/agent/update", {
+      method: "PATCH",
+      body: JSON.stringify({ agentId, ...data }),
+    }, apiKey),
+
+  // ─── Modo / Variáveis ─────────────────────────────────────────────────────
   setMode: (agentId: string, mode: string, apiKey: string, sessionId?: string) =>
     zaiaFetch("/v1.1/api/agent/variables", {
       method: "PATCH",
@@ -33,14 +47,47 @@ export const zaiaAPI = {
       }),
     }, apiKey),
 
-  sendMessage: (agentId: string, target: string, message: string, apiKey: string) =>
-    zaiaFetch("/v1.1/api/agent/send-channel-message", {
-      method: "POST",
-      body: JSON.stringify({ agentId, channel: "whatsapp", target, message }),
+  // ─── Chat / Transbordo ───────────────────────────────────────────────────
+  resolveTakeover: (chatId: string, apiKey: string) =>
+    zaiaFetch("/v1.1/api/external-generative-chat/resolve-takeover", {
+      method: "PATCH",
+      body: JSON.stringify({ externalGenerativeChatId: chatId }),
     }, apiKey),
 
-  cancelFollowUp: (agentId: string, sessionId: string, apiKey: string) =>
-    zaiaFetch("/v1.1/api/agent/follow-up/cancel", {
+  // ─── Mensagens ───────────────────────────────────────────────────────────
+  sendMessage: (agentId: string, target: string, message: string, apiKey: string) =>
+    zaiaFetch("/message-cross-channel/create", {
+      method: "POST",
+      body: JSON.stringify({ agentId, whatsAppPhoneNumber: target, message }),
+    }, apiKey, ZAIA_CORE),
+
+  sendMedia: (agentId: string, target: string, payload: { message?: string; imageUrl?: string; audioUrl?: string }, apiKey: string) =>
+    zaiaFetch("/message-cross-channel/create", {
+      method: "POST",
+      body: JSON.stringify({ agentId, whatsAppPhoneNumber: target, ...payload }),
+    }, apiKey, ZAIA_CORE),
+
+  // ─── Follow Up ────────────────────────────────────────────────────────────
+  listFollowUps: (agentId: string, apiKey: string) =>
+    zaiaFetch(`/v1.1/api/agent-follow-up/retrieve-multiple?agentId=${agentId}`, {}, apiKey),
+
+  createFollowUp: (agentId: string, data: { sessionId: string; message: string; delayMinutes: number }, apiKey: string) =>
+    zaiaFetch("/v1.1/api/agent-follow-up/create", {
+      method: "POST",
+      body: JSON.stringify({ agentId, ...data }),
+    }, apiKey),
+
+  updateFollowUp: (followUpId: string, data: Record<string, unknown>, apiKey: string) =>
+    zaiaFetch("/v1.1/api/agent-follow-up/update", {
+      method: "PATCH",
+      body: JSON.stringify({ id: followUpId, ...data }),
+    }, apiKey),
+
+  deleteFollowUp: (followUpId: string, apiKey: string) =>
+    zaiaFetch(`/v1.1/api/agent-follow-up/remove?id=${followUpId}`, { method: "DELETE" }, apiKey),
+
+  cancelFollowUps: (agentId: string, sessionId: string, apiKey: string) =>
+    zaiaFetch("/v1.1/api/agent-follow-up/cancel", {
       method: "POST",
       body: JSON.stringify({ agentId, sessionId }),
     }, apiKey),

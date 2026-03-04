@@ -3,10 +3,15 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/ui/Sidebar";
 import { getUserClient } from "@/lib/db-helper";
 import { Suspense } from "react";
+import { isSuperAdmin } from "@/lib/admin-auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await stackServerApp.getUser();
   if (!user) redirect("/login");
+
+  if (await isSuperAdmin(user.primaryEmail)) {
+    redirect("/admin/dashboard");
+  }
 
   // Attempt to load and optionally bind the client's stackUserId if newly signed up
   const client = await getUserClient(user.id, user.primaryEmail);

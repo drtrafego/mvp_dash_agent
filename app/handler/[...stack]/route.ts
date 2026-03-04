@@ -1,3 +1,3 @@
 import { stackServerApp } from "@/stack";
 
-export const { GET, POST } = stackServerApp;
+export const { GET, POST } = (stackServerApp as any).handler;

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import AgentModeControl from "@/components/dashboard/AgentModeControl";
 import Link from "next/link";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 interface AnalyticsData {
   stats: { msgsToday: number; leadsThisMonth: number; openConvs: number; whatsappMsgsThisMonth: number | null };
@@ -24,23 +25,23 @@ interface AnalyticsData {
 }
 
 function MiniBarChart({ data }: { data: { date: string; count: number }[] }) {
-  const max = Math.max(...data.map((d) => d.count), 1);
+  const chartData = data.map((d) => ({
+    ...d,
+    label: new Date(d.date + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "short" }),
+  }));
   return (
-    <div className="flex items-end gap-1 h-16 mt-3">
-      {data.map((d) => {
-        const h = Math.max(Math.round((d.count / max) * 64), 4);
-        const day = new Date(d.date + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "short" });
-        return (
-          <div key={d.date} className="flex flex-col items-center flex-1 gap-1" title={`${day}: ${d.count} msgs`}>
-            <div
-              className="w-full rounded-t bg-blue-500 transition-all hover:bg-blue-600"
-              style={{ height: `${h}px` }}
-            />
-            <span className="text-[10px] text-gray-400">{day}</span>
-          </div>
-        );
-      })}
-    </div>
+    <ResponsiveContainer width="100%" height={80}>
+      <BarChart data={chartData} margin={{ top: 4, right: 0, bottom: 0, left: -32 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+        <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+        <YAxis hide />
+        <Tooltip
+          contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 11 }}
+          formatter={(v: number) => [v, "Mensagens"]}
+        />
+        <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }
 

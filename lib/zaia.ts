@@ -91,4 +91,11 @@ export const zaiaAPI = {
       method: "POST",
       body: JSON.stringify({ agentId, sessionId }),
     }, apiKey),
+
+  // ─── Chats externos (via Zaia) ────────────────────────────────────────────
+  listZaiaChats: (agentId: string, apiKey: string, limit = 50, offset = 0) =>
+    zaiaFetch(`/v1.1/api/external-generative-chat/retrieve-multiple?agentIds=${agentId}&limit=${limit}&offset=${offset}`, {}, apiKey),
+
+  listZaiaMessages: (chatIds: string, apiKey: string) =>
+    zaiaFetch(`/v1.1/api/external-generative-message/retrieve-multiple?externalGenerativeChatIds=${chatIds}`, {}, apiKey),
 };

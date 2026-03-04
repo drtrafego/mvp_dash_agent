@@ -2,6 +2,7 @@ import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/ui/Sidebar";
 import { getUserClient } from "@/lib/db-helper";
+import { Suspense } from "react";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await stackServerApp.getUser();
@@ -16,7 +17,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+      <Suspense fallback={<div className="w-64 bg-gray-900 border-r border-gray-800" />}>
+        <Sidebar />
+      </Suspense>
       <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
     </div>
   );

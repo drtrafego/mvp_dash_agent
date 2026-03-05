@@ -109,7 +109,7 @@ export default function MetricasPage() {
                         <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} />
                         <Tooltip
                             contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: 12 }}
-                            formatter={(v: number) => [v, "Mensagens"]}
+                            formatter={(v: unknown) => [v, "Mensagens"]}
                         />
                         <Line type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
                     </LineChart>
@@ -129,7 +129,7 @@ export default function MetricasPage() {
                                 {charts.leadFunnel.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                             </Pie>
                             <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
-                            <Tooltip formatter={(v: number) => [v, "Leads"]} />
+                            <Tooltip formatter={(v: unknown) => [v, "Leads"]} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -144,7 +144,7 @@ export default function MetricasPage() {
                                 {charts.convStatus.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                             </Pie>
                             <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
-                            <Tooltip formatter={(v: number) => [v, "Conversas"]} />
+                            <Tooltip formatter={(v: unknown) => [v, "Conversas"]} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -159,7 +159,7 @@ export default function MetricasPage() {
                                 {charts.botVsHuman.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                             </Pie>
                             <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
-                            <Tooltip formatter={(v: number) => [v, "Conversas"]} />
+                            <Tooltip formatter={(v: unknown) => [v, "Conversas"]} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -173,7 +173,7 @@ export default function MetricasPage() {
                     <BarChart data={charts.leadFunnel} layout="vertical" margin={{ top: 0, right: 20, bottom: 0, left: 60 }}>
                         <XAxis type="number" tick={{ fontSize: 11, fill: "#94a3b8" }} />
                         <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#64748b" }} width={70} />
-                        <Tooltip formatter={(v: number) => [v, "Leads"]} contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 12 }} />
+                        <Tooltip formatter={(v: unknown) => [v, "Leads"]} contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 12 }} />
                         <Bar dataKey="value" radius={[0, 6, 6, 0]}>
                             {charts.leadFunnel.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                         </Bar>

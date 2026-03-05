@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
             zaiaAgentId: true,
             plan: true,
             active: true,
+            notifyEmail: true,
+            notifyEmails: true,
             createdAt: true,
             _count: { select: { conversations: true, leads: true } },
         },

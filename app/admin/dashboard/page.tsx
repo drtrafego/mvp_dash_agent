@@ -8,9 +8,12 @@ import ClientRow from "@/components/admin/ClientRow";
 interface Client {
     id: string;
     companyName: string;
+    email?: string | null;
     zaiaAgentId: string;
     plan: string;
     active: boolean;
+    notifyEmail?: string | null;
+    notifyEmails?: string;
     createdAt: string;
     _count: { conversations: number; leads: number };
 }
@@ -88,8 +91,8 @@ export default function AdminDashboardPage() {
                     <button
                         onClick={() => setShowForm(!showForm)}
                         className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${showForm
-                                ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                                : "bg-violet-600 hover:bg-violet-700 text-white"
+                            ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                            : "bg-violet-600 hover:bg-violet-700 text-white"
                             }`}
                     >
                         {showForm ? "Cancelar" : "+ Novo cliente"}

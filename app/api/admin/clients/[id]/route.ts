@@ -8,18 +8,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (authError) return authError;
 
     const { id } = await params;
-    const { companyName, zaiaApiKey, plan, active, pauseMessage, attendantName, notifyEmail } = await req.json();
+    const { companyName, email, zaiaApiKey, zaiaAgentId, plan, active, pauseMessage, attendantName, notifyEmail, notifyEmails } = await req.json();
 
     const client = await db.client.update({
         where: { id },
         data: {
             ...(companyName !== undefined && { companyName }),
+            ...(email !== undefined && { email: email || null }),
             ...(zaiaApiKey !== undefined && { zaiaApiKey }),
+            ...(zaiaAgentId !== undefined && { zaiaAgentId }),
             ...(plan !== undefined && { plan }),
             ...(active !== undefined && { active }),
             ...(pauseMessage !== undefined && { pauseMessage }),
             ...(attendantName !== undefined && { attendantName }),
             ...(notifyEmail !== undefined && { notifyEmail: notifyEmail || null }),
+            ...(notifyEmails !== undefined && { notifyEmails: JSON.stringify(Array.isArray(notifyEmails) ? notifyEmails : []) }),
         },
     });
 

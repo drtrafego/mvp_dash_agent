@@ -19,6 +19,7 @@ model Client {
   pauseMessage  String         @default("Retornaremos em breve!")
   attendantName String         @default("Atendente")
   notifyEmail   String?
+  notifyEmails  String         @default("[]") // JSON array of email strings
   conversations Conversation[]
   leads         Lead[]
   createdAt     DateTime       @default(now())

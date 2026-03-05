@@ -37,7 +37,7 @@ function MiniBarChart({ data }: { data: { date: string; count: number }[] }) {
         <YAxis hide />
         <Tooltip
           contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", fontSize: 11 }}
-          formatter={(v: number) => [v, "Mensagens"]}
+          formatter={(v: unknown) => [String(v ?? ""), "Mensagens"]}
         />
         <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
       </BarChart>
